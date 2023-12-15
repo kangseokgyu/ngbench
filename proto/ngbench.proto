@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "github.com/kangseokgyu/ngbench";
+
+package ngbench;
+
+service NGBenchService {
+  rpc ReportResult (stream Result) returns (ResultReply) {}
+}
+
+message Result {
+  string data = 1;
+}
+
+message ResultReply {
+  string message = 1;
+}

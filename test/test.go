@@ -26,7 +26,6 @@ func main() {
 		fmt.Printf("data: %02x\n", append(data[:], ' '))
 	}
 
-	c := make(chan string, 10)
-	go reporter.SendResult(c)
-	anchor.RecvResult(c)
+	go reporter.SendResult()
+	anchor.RecvResult(19895)
 }

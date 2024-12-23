@@ -6,6 +6,7 @@ package ngbench;
 
 service NGBenchService {
   rpc ReportResult (stream Result) returns (ResultReply) {}
+  rpc ReportDeauthTimestampResult (stream DeauthTimestampResult) returns (DeauthTimestampResultReply) {}
 }
 
 message Result {
@@ -14,4 +15,11 @@ message Result {
 
 message ResultReply {
   string message = 1;
+}
+
+message DeauthTimestampResult {
+  uint64 timestamp = 1;
+}
+
+message DeauthTimestampResultReply {
 }

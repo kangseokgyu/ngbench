@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NGBenchServiceClient interface {
 	ReportResult(ctx context.Context, opts ...grpc.CallOption) (NGBenchService_ReportResultClient, error)
+	ReportDeauthTimestampResult(ctx context.Context, opts ...grpc.CallOption) (NGBenchService_ReportDeauthTimestampResultClient, error)
 }
 
 type nGBenchServiceClient struct {
@@ -67,11 +68,46 @@ func (x *nGBenchServiceReportResultClient) CloseAndRecv() (*ResultReply, error) 
 	return m, nil
 }
 
+func (c *nGBenchServiceClient) ReportDeauthTimestampResult(ctx context.Context, opts ...grpc.CallOption) (NGBenchService_ReportDeauthTimestampResultClient, error) {
+	stream, err := c.cc.NewStream(ctx, &NGBenchService_ServiceDesc.Streams[1], "/ngbench.NGBenchService/ReportDeauthTimestampResult", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &nGBenchServiceReportDeauthTimestampResultClient{stream}
+	return x, nil
+}
+
+type NGBenchService_ReportDeauthTimestampResultClient interface {
+	Send(*DeauthTimestampResult) error
+	CloseAndRecv() (*DeauthTimestampResultReply, error)
+	grpc.ClientStream
+}
+
+type nGBenchServiceReportDeauthTimestampResultClient struct {
+	grpc.ClientStream
+}
+
+func (x *nGBenchServiceReportDeauthTimestampResultClient) Send(m *DeauthTimestampResult) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *nGBenchServiceReportDeauthTimestampResultClient) CloseAndRecv() (*DeauthTimestampResultReply, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(DeauthTimestampResultReply)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // NGBenchServiceServer is the server API for NGBenchService service.
 // All implementations must embed UnimplementedNGBenchServiceServer
 // for forward compatibility
 type NGBenchServiceServer interface {
 	ReportResult(NGBenchService_ReportResultServer) error
+	ReportDeauthTimestampResult(NGBenchService_ReportDeauthTimestampResultServer) error
 	mustEmbedUnimplementedNGBenchServiceServer()
 }
 
@@ -81,6 +117,9 @@ type UnimplementedNGBenchServiceServer struct {
 
 func (UnimplementedNGBenchServiceServer) ReportResult(NGBenchService_ReportResultServer) error {
 	return status.Errorf(codes.Unimplemented, "method ReportResult not implemented")
+}
+func (UnimplementedNGBenchServiceServer) ReportDeauthTimestampResult(NGBenchService_ReportDeauthTimestampResultServer) error {
+	return status.Errorf(codes.Unimplemented, "method ReportDeauthTimestampResult not implemented")
 }
 func (UnimplementedNGBenchServiceServer) mustEmbedUnimplementedNGBenchServiceServer() {}
 
@@ -121,6 +160,32 @@ func (x *nGBenchServiceReportResultServer) Recv() (*Result, error) {
 	return m, nil
 }
 
+func _NGBenchService_ReportDeauthTimestampResult_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(NGBenchServiceServer).ReportDeauthTimestampResult(&nGBenchServiceReportDeauthTimestampResultServer{stream})
+}
+
+type NGBenchService_ReportDeauthTimestampResultServer interface {
+	SendAndClose(*DeauthTimestampResultReply) error
+	Recv() (*DeauthTimestampResult, error)
+	grpc.ServerStream
+}
+
+type nGBenchServiceReportDeauthTimestampResultServer struct {
+	grpc.ServerStream
+}
+
+func (x *nGBenchServiceReportDeauthTimestampResultServer) SendAndClose(m *DeauthTimestampResultReply) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *nGBenchServiceReportDeauthTimestampResultServer) Recv() (*DeauthTimestampResult, error) {
+	m := new(DeauthTimestampResult)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // NGBenchService_ServiceDesc is the grpc.ServiceDesc for NGBenchService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -132,6 +197,11 @@ var NGBenchService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "ReportResult",
 			Handler:       _NGBenchService_ReportResult_Handler,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "ReportDeauthTimestampResult",
+			Handler:       _NGBenchService_ReportDeauthTimestampResult_Handler,
 			ClientStreams: true,
 		},
 	},

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"time"
 
 	pb "github.com/kangseokgyu/ngbench/proto"
 	"google.golang.org/grpc"
@@ -25,6 +26,19 @@ func (s *server) ReportResult(stream pb.NGBenchService_ReportResultServer) error
 	resp := &pb.ResultReply{
 		Message: "Data received successfully!",
 	}
+	return stream.SendAndClose(resp)
+}
+
+func (s *server) ReportDeauthTimestampResult(stream pb.NGBenchService_ReportDeauthTimestampResultServer) error {
+	for {
+		data, err := stream.Recv()
+		if err != nil {
+			log.Printf("error while receiving stream: %v", err)
+			break
+		}
+		log.Printf("Received data: %s", time.Unix(0, int64(data.Timestamp)).String())
+	}
+	resp := &pb.DeauthTimestampResultReply{}
 	return stream.SendAndClose(resp)
 }
 
